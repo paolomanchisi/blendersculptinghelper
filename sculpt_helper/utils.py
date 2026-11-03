@@ -131,3 +131,10 @@ def rect_points(a, b):
 def in_region(context, coord):
     region = context.region
     return region is not None and 0 <= coord[0] < region.width and 0 <= coord[1] < region.height
+
+
+def sculpting_mesh(context):
+    """Like in_sculpt_mode, but without needing a 3D viewport (for operators
+    that only touch object data)."""
+    obj = context.active_object
+    return obj is not None and obj.type == 'MESH' and context.mode == 'SCULPT'

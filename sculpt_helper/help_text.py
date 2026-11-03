@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Text shown by each panel's "?" button."""
+
+HELP = {
+    "BRUSH": (
+        "Pick a brush and set its radius (R) and strength (S).",
+        "The pen icons turn tablet pressure on for each value.",
+        "Texture, Stroke and Falloff open Blender's own settings.",
+        "Auto-masking limits strokes to topology, face sets,",
+        "mesh or face set boundaries, front faces or cavities.",
+        "Q opens the brush pie; edit its brushes in Preferences.",
+    ),
+    "MASK_HIDE": (
+        "Mask: invert, clear, blur, sharpen, grow or shrink the mask.",
+        "Hide / Show: show everything, invert what is visible, hide or",
+        "show the masked part, or grow / shrink the visible area.",
+        "Hold C for the mask brush and Shift+C to isolate an area.",
+        "A opens the mask pie and Shift+W the hide pie.",
+    ),
+    "VIEW_MODE": (
+        "Mirror toggles X / Y / Z symmetry; Symmetrize copies one side",
+        "onto the other in the chosen direction.",
+        "Display shows or fades the mask and face set overlays and",
+        "the wireframe.",
+        "Dyntopo adds or removes detail while you sculpt. Detail Flood",
+        "Fill applies the current detail size to the whole mesh.",
+        "Z opens these settings as a popup anywhere in the viewport.",
+    ),
+    "DEFORM": (
+        "Filters move every visible, unmasked vertex at once.",
+        "Set Strength and Iterations, then press a filter.",
+        "Expand / Shrink scale the mesh, Inflate / Deflate push it along",
+        "its normals, Sphere rounds it, Random adds noise, Sharpen and",
+        "Enhance bring out detail, Relax evens out the topology.",
+        "Mask the parts you want to keep still.",
+    ),
+    "FACE_SETS": (
+        "Face sets split the mesh into coloured groups that you can",
+        "hide, isolate and auto-mask by.",
+        "Create a face set from the mask, the visible part or all.",
+        "Auto Create builds them from loose parts, normals,",
+        "materials, UV seams and more.",
+        "Alt+W opens the face set pie; Shift+C click isolates one.",
+    ),
+    "VERTEX_COLOR": (
+        "Pick a colour on the wheel or from the palette swatches.",
+        "Paint switches to the Paint brush.",
+        "Fill colours the visible, unmasked part in one go.",
+    ),
+    "MATERIAL": (
+        "Switch the viewport between MatCap, Studio and Flat lighting",
+        "and pick a MatCap to judge forms quickly.",
+        "Object colour and cavity help read small details.",
+    ),
+    "MULTIRES": (
+        "Adds a Multiresolution modifier if the object has none.",
+        "Subdivide adds a level (smooth, simple or linear).",
+        "Level - / + move between levels. With Link Levels on, the",
+        "viewport, sculpt and render levels move together.",
+        "Delete Higher removes levels above the current one;",
+        "Apply Base fits the base mesh to the sculpted shape.",
+    ),
+    "EXTRACT": (
+        "Extract makes a new object from the masked area, optionally",
+        "with thickness. Slice cuts the masked area off, either into",
+        "a new object or by deleting it.",
+        "Face Set Extract lets you click a face set to extract it.",
+    ),
+    "REMESH": (
+        "Voxel Remesh rebuilds the mesh with even topology at the",
+        "chosen voxel size. Smaller sizes keep more detail.",
+        "Preserve options keep volume, attributes and face sets.",
+        "QuadriFlow builds an all-quad mesh with a target face count.",
+    ),
+}
