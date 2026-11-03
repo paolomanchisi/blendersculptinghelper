@@ -106,4 +106,14 @@ HELP = {
         "or Edit it to move / scale it, then go Back to Sculpting.",
         "Confirm applies all visible cutters; Cancel removes them.",
     ),
+    "HISTORY": (
+        "Snapshots are taken every N strokes, or by hand with Snapshot.",
+        "Click one to select it. Jump restores it (even after a remesh);",
+        "sculpting from an older snapshot starts a new branch.",
+        "Blend slides between now and the selected snapshot.",
+        "Paint Back restores it where you mask; the Morph Target brush",
+        "paints it back (or the Recorded Shape) wherever you stroke.",
+        "Timeline shows the tree along the bottom of the viewport.",
+        "Keep in File stores the snapshots in the .blend when you save.",
+    ),
 }

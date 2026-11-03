@@ -2,7 +2,7 @@
 """Per-scene settings used by the panels."""
 
 import bpy
-from bpy.props import BoolProperty, FloatProperty, IntProperty, PointerProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, PointerProperty
 
 
 class SculptHelperSceneSettings(bpy.types.PropertyGroup):
@@ -64,6 +64,41 @@ class SculptHelperSceneSettings(bpy.types.PropertyGroup):
         name="Slice to New Object",
         description="Keep the sliced part as a new object instead of deleting it",
         default=True)
+    history_auto: BoolProperty(
+        name="Auto Snapshot", description="Take a history snapshot every few strokes",
+        default=True, update=lambda self, ctx: _history_auto_update(self, ctx))
+    history_every: IntProperty(
+        name="Every N Strokes", description="Strokes between automatic snapshots",
+        default=5, min=1, soft_max=50)
+    history_max: IntProperty(
+        name="Max Snapshots", description=("Oldest snapshots are dropped past this number "
+                                           "(the current one and the selected one are kept)"),
+        default=30, min=2, soft_max=200)
+    history_keep_in_file: BoolProperty(
+        name="Keep in File",
+        description="Save the snapshots inside the .blend file (makes the file bigger)",
+        default=False)
+    history_blend: FloatProperty(
+        name="Blend", description="Blend the current shape toward the selected snapshot",
+        default=0.0, min=0.0, max=1.0, update=lambda self, ctx: _history_blend_update(self, ctx))
+    morph_target: EnumProperty(
+        name="Target", description="Shape the Morph Target brush pulls toward",
+        items=(('RECORDED', "Recorded Shape", "The shape saved with Record Shape (Deform panel)"),
+               ('SNAPSHOT', "Snapshot", "The snapshot selected in the History panel")),
+        default='SNAPSHOT')
+    morph_brush_strength: FloatProperty(
+        name="Strength", description="How far each dab pulls toward the target",
+        default=0.5, min=0.0, max=1.0)
+
+
+def _history_auto_update(self, context):
+    from . import history
+    history.auto_update(self, context)
+
+
+def _history_blend_update(self, context):
+    from . import history_ui
+    history_ui.blend_update(self, context)
 
 
 def _depth_auto_update(self, context):

@@ -71,6 +71,7 @@ don't need.
 | Layers | Sculpt layers with strength sliders and mute. |
 | Remesh | Voxel size and options, Voxel Remesh, QuadriFlow, Shape Transfer. |
 | Boolean | Cutters (sphere / cube / cylinder) kept as editable Boolean layers until confirmed. |
+| History | Snapshot timeline with branches, Blend, Paint Back and the Morph Target brush. |
 
 ## Sculpt helpers
 
@@ -93,10 +94,12 @@ don't need.
 | Gizmo | Deform > Gizmo, or the A pie | Mask what should stay, then move, rotate and scale the unmasked part with a gizmo. Pivot at its centre, on the mask border (joints) or the origin. |
 | Sculpt Layers | Layers panel | Add a layer and sculpt: changes go into the recording (●) layer. Fade layers with their slider, mute them, delete them (removes their change) or Apply All. |
 | Shape Transfer | Remesh > Shape Transfer | Remesh (Keep Detail) voxel-remeshes and pulls the result back onto the old surface. Transfer Shape pulls the unmasked surface onto another object. |
+| History Timeline | History panel, Timeline button | Snapshots every N strokes (default 5) plus ones you take by hand. Click one to select it; Jump (or double-click on the timeline) restores it, even after a remesh. Sculpting from an older snapshot starts a branch, so nothing is lost. Blend slides between now and the selected snapshot; Paint Back restores it where you mask. The Timeline button draws the tree with thumbnails along the bottom of the viewport. Optional Keep in File stores snapshots in the .blend. |
+| Morph Target Brush | History panel, or the Brush button on the timeline | Paint the surface back toward the selected snapshot or the Recorded Shape. Uses the current brush radius; Esc or right-click to finish. |
 | Boolean Layers | Boolean panel | Add cutters at the 3D cursor; change operation, hide, Edit (move / scale in Object Mode, then Back to Sculpting) or remove each one. Confirm applies them all, Cancel discards them. |
 
 Depth Limit, Morph, Copy Stamp, saved masks, material by mask, Pivot Bend and
-Sculpt Layers edit vertex
+Sculpt Layers, Blend, Paint Back and the Morph Target brush edit vertex
 data directly, so they briefly leave Sculpt Mode and come back (each use is one
 undo step). Like the reference add-on, they don't work with Dyntopo on, a
 Multires modifier, or shape keys; the panel says so when that's the case.
@@ -119,6 +122,8 @@ per-object (voxel remesh merges the parts).
 
 5. **Custom-drawn UI** (done): brush wheel with thumbnails and floating
    panels; the native pies and sidebar panels remain as a fallback.
+6. **History** (done): branching snapshot timeline, Blend, Paint Back and the
+   Morph Target brush.
 
 ## Testing
 
@@ -126,7 +131,9 @@ per-object (voxel remesh merges the parts).
 Multires helpers. `tests/test_tools.py` checks the sculpt helpers on real mesh
 data (mask combine modes, Morph, Depth Limit, Copy Stamp, material by mask,
 Sculpt Together round trip, pivot bend geometry, sculpt layers, shape
-transfer, boolean confirm / cancel). `tests/test_custom_ui.py` checks the
+transfer, boolean confirm / cancel). `tests/test_history.py` checks the
+snapshot tree and branches, Blend, Paint Back, the Morph Target dab, Jump
+after a topology change, the snapshot limit and the Keep in File round trip. `tests/test_custom_ui.py` checks the
 brush wheel and floating card layout and hit testing, and that every card
 control targets a real operator or property. The GPU drawing itself needs a
 real viewport. `tests/test_ui_names.py` draws every panel, pie and popup into
@@ -159,6 +166,10 @@ Interactive behaviour needs a real viewport. Manual checklist:
 - [ ] Layers: add a layer, sculpt, drag its slider to fade the change.
 - [ ] Boolean: add a sphere cutter, Edit to move it, Confirm.
 - [ ] Q: wheel shows brush thumbnails; click and release-to-pick both work.
+- [ ] History: sculpt 5 strokes, a snapshot appears; Jump back, sculpt, a branch appears.
+- [ ] Timeline: thumbnails draw; Blend drag previews live; double-click jumps.
+- [ ] Morph Target brush: strokes pull toward the selected snapshot.
+- [ ] Keep in File on: save, reopen, the snapshots are still there.
 - [ ] S > Floating Panels: cards draw, drag, collapse, ?, ≡ and × work; sliders drag; sculpting under empty space still works.
 
 ## License

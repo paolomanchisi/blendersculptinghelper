@@ -4,7 +4,7 @@
 import bpy
 from bl_ui.properties_paint_common import BrushAssetShelf, UnifiedPaintPanel
 
-from . import (ops_boolean, ops_gravity, ops_layers, ops_masks, ops_material, ops_multi,
+from . import (history_ui, ops_boolean, ops_gravity, ops_layers, ops_masks, ops_material, ops_multi,
                ops_pivot, ops_shape, ops_stamp, ops_transfer, ops_transform, utils)
 from .help_text import HELP
 
@@ -24,6 +24,7 @@ PANELS = (
     ("EXTRACT", "Extract"),
     ("REMESH", "Remesh"),
     ("BOOLEAN", "Boolean"),
+    ("HISTORY", "History"),
 )
 
 
@@ -457,6 +458,7 @@ DRAW = {
     "EXTRACT": draw_extract,
     "REMESH": draw_remesh,
     "BOOLEAN": ops_boolean.draw_boolean,
+    "HISTORY": history_ui.draw_history,
 }
 
 

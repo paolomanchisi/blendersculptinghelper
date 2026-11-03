@@ -21,7 +21,7 @@ TAB_LABELS = {
     "BRUSH": "Brush", "MASK_HIDE": "Mask", "VIEW_MODE": "View", "DEFORM": "Deform",
     "FACE_SETS": "Face Sets", "VERTEX_COLOR": "Color", "MATERIAL": "Material",
     "MULTIRES": "Multires", "LAYERS": "Layers", "EXTRACT": "Extract", "REMESH": "Remesh",
-    "BOOLEAN": "Boolean",
+    "BOOLEAN": "Boolean", "HISTORY": "History",
 }
 
 
@@ -312,11 +312,23 @@ def card_boolean(context):
     ]
 
 
+def card_history(context):
+    return [
+        [Button("+ Snapshot", "sculpt_helper.history_snapshot"),
+         Button("Timeline", "sculpt_helper.history_timeline", invoke=True)],
+        [Button("Jump", "sculpt_helper.history_jump"),
+         Button("Paint Back", "sculpt_helper.history_paint_back")],
+        [Slider("Blend", _settings, "history_blend", 0.0, 1.0)],
+        [Button("Morph Target Brush", "sculpt_helper.morph_brush", invoke=True)],
+    ]
+
+
 CARDS = {
     "BRUSH": card_brush, "MASK_HIDE": card_mask, "VIEW_MODE": card_view,
     "DEFORM": card_deform, "FACE_SETS": card_face_sets, "VERTEX_COLOR": card_color,
     "MATERIAL": card_material, "MULTIRES": card_multires, "LAYERS": card_layers,
     "EXTRACT": card_extract, "REMESH": card_remesh, "BOOLEAN": card_boolean,
+    "HISTORY": card_history,
 }
 
 
