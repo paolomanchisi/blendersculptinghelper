@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "sculpt_helper"
-version = "0.3.0"
+version = "0.4.0"
 name = "Sculpt Helper"
 tagline = "Hold keys, quick menus and helper tools for faster sculpting"
 maintainer = "Paolo Manchisi"

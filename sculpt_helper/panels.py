@@ -4,7 +4,8 @@
 import bpy
 from bl_ui.properties_paint_common import BrushAssetShelf, UnifiedPaintPanel
 
-from . import ops_gravity, ops_masks, ops_material, ops_multi, ops_shape, ops_stamp, utils
+from . import (ops_boolean, ops_gravity, ops_layers, ops_masks, ops_material, ops_multi,
+               ops_pivot, ops_shape, ops_stamp, ops_transfer, ops_transform, utils)
 from .help_text import HELP
 
 CATEGORY = "Sculpt Helper"
@@ -19,8 +20,10 @@ PANELS = (
     ("VERTEX_COLOR", "Vertex Color"),
     ("MATERIAL", "Material"),
     ("MULTIRES", "Multires"),
+    ("LAYERS", "Layers"),
     ("EXTRACT", "Extract"),
     ("REMESH", "Remesh"),
+    ("BOOLEAN", "Boolean"),
 )
 
 
@@ -322,6 +325,8 @@ def draw_deform(layout, context):
     pair(("Sharpen", 'SHARPEN', 1.0), ("Enhance", 'ENHANCE_DETAILS', 1.0))
     pair(("Relax", 'RELAX', 1.0), ("Relax FS", 'RELAX_FACE_SETS', 1.0))
 
+    _sub_panel(layout, context, "show_pivot", "Pivot Bend", ops_pivot.draw_pivot)
+    _sub_panel(layout, context, "show_gizmo", "Gizmo", ops_transform.draw_gizmo)
     _sub_panel(layout, context, "show_morph", "Morph", ops_shape.draw_morph)
     _sub_panel(layout, context, "show_stamp", "Copy Stamp", ops_stamp.draw_stamp)
 
@@ -436,6 +441,7 @@ def draw_remesh(layout, context):
     row.operator("object.voxel_size_edit", text="", icon='MOD_REMESH')
     row.operator("object.voxel_remesh", text="Voxel Remesh")
     layout.operator("object.quadriflow_remesh", text="QuadriFlow Remesh")
+    _sub_panel(layout, context, "show_transfer", "Shape Transfer", ops_transfer.draw_transfer)
 
 
 DRAW = {
@@ -447,8 +453,10 @@ DRAW = {
     "VERTEX_COLOR": draw_vertex_color,
     "MATERIAL": draw_material,
     "MULTIRES": draw_multires,
+    "LAYERS": ops_layers.draw_layers,
     "EXTRACT": draw_extract,
     "REMESH": draw_remesh,
+    "BOOLEAN": ops_boolean.draw_boolean,
 }
 
 

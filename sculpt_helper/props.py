@@ -44,6 +44,22 @@ class SculptHelperSceneSettings(bpy.types.PropertyGroup):
         name="Replace Detail",
         description="Replace the detail already at the target instead of adding to it",
         default=True)
+    pivot_blend: FloatProperty(
+        name="Blend Width", description=("How far the bend fades into the root side, "
+                                         "relative to the limb thickness (W)"),
+        default=0.6, min=0.0, soft_max=3.0)
+    pivot_length: FloatProperty(
+        name="Bend Length", description=("Spread the bend along the part, relative to the limb "
+                                         "thickness, for necks and tails (R). 0 bends at the joint"),
+        default=0.0, min=0.0, soft_max=10.0)
+    pivot_use_mask: BoolProperty(
+        name="Use Mask", description="Masked areas don't move (M)", default=False)
+    pivot_smooth: BoolProperty(
+        name="Smooth Joint", description="Smooth the bend around the joint (K)", default=True)
+    transfer_source: PointerProperty(
+        name="Source", type=bpy.types.Object,
+        description="Object whose surface the shape is transferred from",
+        poll=lambda self, obj: obj.type == 'MESH')
     slice_new_object: BoolProperty(
         name="Slice to New Object",
         description="Keep the sliced part as a new object instead of deleting it",

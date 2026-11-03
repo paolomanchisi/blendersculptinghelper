@@ -161,5 +161,100 @@ check(len(a.modifiers) == 1 and b.data.materials[0] == mat, "modifiers and mater
 b_after = [b.matrix_world @ v.co for v in b.data.vertices[:5]]
 check(all((p - q).length < 1e-4 for p, q in zip(b_world, b_after)), "world positions preserved")
 
+# Pivot bend (math) -----------------------------------------------------------
+from sculpt_helper import ops_layers, ops_pivot, ops_transfer  # noqa: E402
+from mathutils.bvhtree import BVHTree  # noqa: E402
+
+if bpy.context.mode != 'OBJECT':
+    bpy.ops.object.mode_set(mode='OBJECT')
+bpy.ops.object.select_all(action='DESELECT')
+bpy.ops.mesh.primitive_cylinder_add(vertices=24, radius=0.2, depth=4.0)
+cyl = bpy.context.active_object
+bpy.ops.object.mode_set(mode='EDIT')
+bpy.ops.mesh.subdivide(number_cuts=40)  # rings along Z so the limb can bend
+bpy.ops.object.mode_set(mode='OBJECT')
+pos = md.get_positions(cyl.data).astype(np.float64)
+e = md.edges(cyl.data)
+setup = ops_pivot.setup_bend(pos, e, np.array([0, 0, 1.0]), thickness=0.4, blend_width=0.1,
+                             bend_length=0.0, smooth_iterations=0)
+check(setup is not None and setup["axis"][2] > 0.9, "pivot axis points along the limb, to the tip")
+w = setup["weights"]
+check(np.all(w[pos[:, 2] > 1.2] > 0.99) and np.all(w[pos[:, 2] < 0.8] == 0), "only the far part moves")
+bent = ops_pivot.rotate(pos, np.array([0, 0, 1.0]), np.array([0, 1.0, 0]), np.pi / 2, w)
+tip = np.argmax(pos[:, 2])
+check(abs(bent[tip, 2] - 1.0) < 0.25 and bent[tip, 0] > 0.8, "90° bend swings the tip sideways")
+check(np.allclose(bent[pos[:, 2] < 0.8], pos[pos[:, 2] < 0.8]), "root side stays put")
+mask = (pos[:, 2] > 1.8).astype(np.float32)
+masked = ops_pivot.setup_bend(pos, e, np.array([0, 0, 1.0]), 0.4, 0.1, 0.0, mask=mask,
+                              use_mask=True, smooth_iterations=0)
+check(np.all(masked["weights"][pos[:, 2] > 1.8] == 0), "masked vertices don't bend")
+curl = ops_pivot.setup_bend(pos, e, np.array([0, 0, 1.0]), 0.4, 0.1, 0.8, smooth_iterations=0)
+mid = (pos[:, 2] > 1.3) & (pos[:, 2] < 1.5)
+check(np.all((curl["weights"][mid] > 0.05) & (curl["weights"][mid] < 0.95)), "bend length spreads the bend")
+
+# Sculpt layers ---------------------------------------------------------------
+bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, location=(10, 0, 0))
+lay = bpy.context.active_object
+bpy.ops.object.mode_set(mode='SCULPT')
+with md.object_mode(bpy.context) as m:
+    p0 = md.get_positions(m).copy()
+bpy.ops.sculpt_helper.layer_add()
+with md.object_mode(bpy.context) as m:
+    md.set_positions(m, p0 + [0, 0, 1.0])     # "sculpt" into layer 1
+lay.sculpt_helper_layers[0].strength = 0.5
+ops_layers.sync(bpy.context, lay)
+with md.object_mode(bpy.context) as m:
+    p = md.get_positions(m)
+check(np.allclose(p, p0 + [0, 0, 0.5], atol=1e-5), "layer strength 0.5 halves its change")
+bpy.ops.sculpt_helper.layer_add()
+with md.object_mode(bpy.context) as m:
+    md.set_positions(m, md.get_positions(m) + [1.0, 0, 0])   # into layer 2
+lay.sculpt_helper_layers[0].mute = True
+ops_layers.sync(bpy.context, lay)
+with md.object_mode(bpy.context) as m:
+    p = md.get_positions(m)
+check(np.allclose(p, p0 + [1.0, 0, 0], atol=1e-5), "muting layer 1 keeps layer 2's change")
+bpy.ops.sculpt_helper.layer_remove()   # removes active layer 2
+with md.object_mode(bpy.context) as m:
+    p = md.get_positions(m)
+check(len(lay.sculpt_helper_layers) == 1 and np.allclose(p, p0, atol=1e-5),
+      "deleting a layer removes its change")
+lay.sculpt_helper_layers[0].mute = False
+ops_layers.sync(bpy.context, lay)
+bpy.ops.sculpt_helper.layer_apply_all()
+with md.object_mode(bpy.context) as m:
+    p = md.get_positions(m)
+    left = [a.name for a in m.attributes if a.name.startswith("sh_layer")]
+check(np.allclose(p, p0 + [0, 0, 0.5], atol=1e-5) and not left and
+      not len(lay.sculpt_helper_layers), "apply all keeps the shape and clears layers")
+bpy.ops.object.mode_set(mode='OBJECT')
+
+# Shape transfer (projection) ---------------------------------------------------
+bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=4, radius=1.0, location=(20, 0, 0))
+src_mesh = bpy.context.active_object.data
+tree = ops_transfer.tree_from_mesh(src_mesh)
+blobby = md.get_positions(src_mesh) * 1.2
+proj = ops_transfer.project(blobby, tree, 1.0, np.ones(len(blobby)))
+check(np.allclose(np.linalg.norm(proj, axis=1), 1.0, atol=0.02), "projection pulls points onto the surface")
+
+# Boolean layers ----------------------------------------------------------------
+bpy.ops.mesh.primitive_cube_add(size=2, location=(30, 0, 0))
+cube = bpy.context.active_object
+bpy.context.scene.cursor.location = (31, 0, 0)
+bpy.ops.object.mode_set(mode='SCULPT')
+verts_before = len(cube.data.vertices)
+bpy.ops.sculpt_helper.boolean_add(shape='SPHERE', operation='DIFFERENCE')
+from sculpt_helper import ops_boolean  # noqa: E402
+mods = ops_boolean.cutter_mods(cube)
+check(len(mods) == 1 and mods[0].object is not None, "cutter added as a Boolean layer")
+bpy.ops.sculpt_helper.boolean_cancel()
+check(not ops_boolean.cutter_mods(cube) and len(cube.data.vertices) == verts_before,
+      "cancel removes cutters and leaves the mesh")
+bpy.ops.sculpt_helper.boolean_add(shape='SPHERE', operation='DIFFERENCE')
+bpy.ops.sculpt_helper.boolean_confirm()
+check(not ops_boolean.cutter_mods(cube) and len(cube.data.vertices) > verts_before
+      and bpy.context.mode == 'SCULPT', "confirm applies the cut and returns to Sculpt Mode")
+check(ops_boolean.COLLECTION not in bpy.data.collections, "cutter collection cleaned up")
+
 print(f"\n{len(failures)} failure(s)")
 sys.exit(1 if failures else 0)

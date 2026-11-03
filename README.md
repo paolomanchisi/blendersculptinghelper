@@ -3,8 +3,8 @@
 A Blender 5.x extension that makes Sculpt Mode faster: hold keys for masking and
 isolating, quick panels, and helper tools that stock Blender lacks.
 
-Status: **step 3 of 4** (hold keys, pie menus, sidebar panels, sculpt helpers). See the plan
-below.
+Status: **all 4 steps done** (hold keys, pie menus, sidebar panels, sculpt
+helpers, advanced tools). See the plan below.
 
 ## Install
 
@@ -28,6 +28,7 @@ shows the current list in the viewport.
 | **Alt+W** | Face Sets pie: from mask / visible, auto create, new colours, Draw Face Sets brush. |
 | **Z** | View / Mode popup: mirror, display overlays, Dyntopo and Multires in one place. |
 | **S** | Choose which sidebar panels are shown. |
+| **Y** | Pivot bend / twist (see below). |
 | **F1** | Shortcut list. |
 
 These replace some Blender defaults in Sculpt Mode while the add-on is enabled
@@ -51,7 +52,9 @@ don't need.
 | Material | MatCap / Studio / Flat lighting, MatCap picker and flip, object colour, cavity. |
 | Multires | Subdivide (smooth / simple / linear, adds the modifier if needed), level − / + with linked levels, delete higher, apply base. |
 | Extract | Extract or slice the masked area, extract a face set. |
-| Remesh | Voxel size and options, Voxel Remesh, QuadriFlow. |
+| Layers | Sculpt layers with strength sliders and mute. |
+| Remesh | Voxel size and options, Voxel Remesh, QuadriFlow, Shape Transfer. |
+| Boolean | Cutters (sphere / cube / cylinder) kept as editable Boolean layers until confirmed. |
 
 ## Sculpt helpers
 
@@ -66,7 +69,18 @@ don't need.
 | Material by mask | Material | Assign the active material slot to the masked faces, or mask the faces using it. |
 | Sculpt Together | View / Mode > Sculpt Together | Select several meshes and Combine: copies are joined into one object (one face set each) and the originals hidden. Split Back writes each part into its original object, keeping name, transform, modifiers and materials. |
 
-Depth Limit, Morph, Copy Stamp, saved masks and material by mask edit vertex
+## Advanced tools
+
+| Tool | Where | What it does |
+| --- | --- | --- |
+| Pivot Bend | **Y**, or Deform > Pivot Bend | Click a joint to drop a pivot in the middle of the limb, drag the pivot to bend the part beyond it; **T** switches to twist. Hold **W** / **R** and move the mouse for blend width (root side) and bend length (curls necks and tails). **M** keeps masked areas still, **K** smooths the joint, **I** shows what will move, **X** or Alt+click deletes a pivot. Works on chains of joints, and mirrors when X symmetry is on. |
+| Gizmo | Deform > Gizmo, or the A pie | Mask what should stay, then move, rotate and scale the unmasked part with a gizmo. Pivot at its centre, on the mask border (joints) or the origin. |
+| Sculpt Layers | Layers panel | Add a layer and sculpt: changes go into the recording (●) layer. Fade layers with their slider, mute them, delete them (removes their change) or Apply All. |
+| Shape Transfer | Remesh > Shape Transfer | Remesh (Keep Detail) voxel-remeshes and pulls the result back onto the old surface. Transfer Shape pulls the unmasked surface onto another object. |
+| Boolean Layers | Boolean panel | Add cutters at the 3D cursor; change operation, hide, Edit (move / scale in Object Mode, then Back to Sculpting) or remove each one. Confirm applies them all, Cancel discards them. |
+
+Depth Limit, Morph, Copy Stamp, saved masks, material by mask, Pivot Bend and
+Sculpt Layers edit vertex
 data directly, so they briefly leave Sculpt Mode and come back (each use is one
 undo step). Like the reference add-on, they don't work with Dyntopo on, a
 Multires modifier, or shape keys; the panel says so when that's the case.
@@ -84,15 +98,18 @@ per-object (voxel remesh merges the parts).
 3. **Sculpt helpers** (done): Depth Limit, Gravity, Morph, Copy Stamp, named masks
    (add / subtract / intersect), thickness-protect auto-mask, material by
    mask, sculpt several objects together.
-4. **Advanced**: pivot bend and twist, sculpt layers, shape transfer after
-   remesh, boolean layers.
+4. **Advanced** (done): pivot bend and twist, gizmo for the unmasked part,
+   sculpt layers, shape transfer after remesh, boolean layers.
+
+Next, if wanted: the custom-drawn brush wheel and floating panels.
 
 ## Testing
 
 `tests/test_headless.py` checks registration, keymap, brush switching and the
 Multires helpers. `tests/test_tools.py` checks the sculpt helpers on real mesh
 data (mask combine modes, Morph, Depth Limit, Copy Stamp, material by mask,
-Sculpt Together round trip). `tests/test_ui_names.py` draws every panel, pie and popup into
+Sculpt Together round trip, pivot bend geometry, sculpt layers, shape
+transfer, boolean confirm / cancel). `tests/test_ui_names.py` draws every panel, pie and popup into
 a recording layout and fails on any property, operator argument, panel or menu
 name this Blender version doesn't have. Run them with
 `blender -b --python tests/<file>` or with the `bpy` module from PyPI
@@ -117,6 +134,10 @@ Interactive behaviour needs a real viewport. Manual checklist:
 - [ ] Gravity Screen ↓ / Into Screen / Drag Direction change how strokes sag.
 - [ ] Copy Stamp: sample a detailed area, stamp it on a smooth one.
 - [ ] Sculpt Together: combine two meshes, sculpt across both, split back.
+- [ ] Y: drop pivots on shoulder and elbow, drag to bend the arm; T twists.
+- [ ] Gizmo: mask the body, move / rotate / scale the unmasked arm.
+- [ ] Layers: add a layer, sculpt, drag its slider to fade the change.
+- [ ] Boolean: add a sphere cutter, Edit to move it, Confirm.
 
 ## License
 

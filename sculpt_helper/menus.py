@@ -68,6 +68,8 @@ class SCULPT_HELPER_MT_mask_pie(bpy.types.Menu):
         col.operator("sculpt.mask_from_cavity", text="From Cavity")
         col.operator("sculpt.mask_init", text="Random per Face Set").mode = 'RANDOM_PER_FACE_SET'
         col.operator("wm.tool_set_by_id", text="Lasso Mask Tool").name = "builtin.lasso_mask"
+        col.operator("sculpt_helper.gizmo_transform", text="Gizmo: Move Unmasked",
+                     icon='OBJECT_ORIGIN').pivot = 'UNMASKED'
 
 
 class SCULPT_HELPER_MT_hide_pie(bpy.types.Menu):
