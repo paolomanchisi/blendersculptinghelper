@@ -1,0 +1,16 @@
+schema_version = "1.0.0"
+
+id = "sculpt_helper"
+version = "0.6.0"
+name = "Sculpt Helper"
+tagline = "Hold keys, quick menus and helper tools for faster sculpting"
+maintainer = "Paolo Manchisi"
+type = "add-on"
+
+blender_version_min = "5.0.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+tags = ["Sculpt", "User Interface"]
+
+[build]
+paths_exclude_pattern = ["__pycache__/", "*.pyc", "/.git/"]
