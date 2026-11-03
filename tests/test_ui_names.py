@@ -85,6 +85,9 @@ class Layout:
             return type("Any", (), {"__setattr__": lambda *a: None})()
         return OpProps(idname)
 
+    def panel(self, idname, **kw):
+        return Layout(), Layout()
+
     def popover(self, panel, **kw):
         if not hasattr(bpy.types, panel):
             errors.append(f"no panel {panel}")

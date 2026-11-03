@@ -3,7 +3,7 @@
 A Blender 5.x extension that makes Sculpt Mode faster: hold keys for masking and
 isolating, quick panels, and helper tools that stock Blender lacks.
 
-Status: **step 2 of 4** (hold keys, pie menus, sidebar panels). See the plan
+Status: **step 3 of 4** (hold keys, pie menus, sidebar panels, sculpt helpers). See the plan
 below.
 
 ## Install
@@ -53,6 +53,26 @@ don't need.
 | Extract | Extract or slice the masked area, extract a face set. |
 | Remesh | Voxel size and options, Voxel Remesh, QuadriFlow. |
 
+## Sculpt helpers
+
+| Tool | Where | What it does |
+| --- | --- | --- |
+| Thickness Protect | Brush > Auto-Masking | Front faces only plus occlusion masking, so strokes don't reach through thin parts. |
+| Depth Limit | Brush > Depth Limit | Record Shape, then nothing can rise more than Max Height or sink more than Max Depth from it. Auto applies it after every stroke; Apply Now does it once. |
+| Gravity | Brush > Gravity | Gravity strength, aimed at the screen bottom, into the screen, world down, or a dragged direction. |
+| Save / Load masks | Mask / Hide > Save / Load | Named masks stored on the mesh; load, add, subtract or intersect them with the current mask. |
+| Morph | Deform > Morph | Record Shape, sculpt, mask where you want the old shape back, press Morph Masked (or Morph Unmasked). |
+| Copy Stamp | Deform > Copy Stamp | Click to sample the surface detail under the brush, click elsewhere to stamp it (Shift+click resamples). Detail Size decides how large a feature counts as detail; Replace Detail swaps the target's own detail for the copy. |
+| Material by mask | Material | Assign the active material slot to the masked faces, or mask the faces using it. |
+| Sculpt Together | View / Mode > Sculpt Together | Select several meshes and Combine: copies are joined into one object (one face set each) and the originals hidden. Split Back writes each part into its original object, keeping name, transform, modifiers and materials. |
+
+Depth Limit, Morph, Copy Stamp, saved masks and material by mask edit vertex
+data directly, so they briefly leave Sculpt Mode and come back (each use is one
+undo step). Like the reference add-on, they don't work with Dyntopo on, a
+Multires modifier, or shape keys; the panel says so when that's the case.
+Sculpt Together doesn't keep vertex groups, and it needs topology to stay
+per-object (voxel remesh merges the parts).
+
 ## Plan
 
 1. **Foundation and hold keys** (done).
@@ -61,15 +81,18 @@ don't need.
    panels for Brush, Mask/Hide, View/Mode, Deform, Face Sets, Vertex Color,
    Material, Multires, Layers, Extract, Remesh and Boolean. A custom-drawn
    brush wheel and floating panels come after the native version.
-3. **Sculpt helpers**: Depth Limit, Gravity, Morph, Copy Stamp, named masks
-   (add / subtract / intersect), thickness-protect auto-mask.
+3. **Sculpt helpers** (done): Depth Limit, Gravity, Morph, Copy Stamp, named masks
+   (add / subtract / intersect), thickness-protect auto-mask, material by
+   mask, sculpt several objects together.
 4. **Advanced**: pivot bend and twist, sculpt layers, shape transfer after
    remesh, boolean layers.
 
 ## Testing
 
 `tests/test_headless.py` checks registration, keymap, brush switching and the
-Multires helpers. `tests/test_ui_names.py` draws every panel, pie and popup into
+Multires helpers. `tests/test_tools.py` checks the sculpt helpers on real mesh
+data (mask combine modes, Morph, Depth Limit, Copy Stamp, material by mask,
+Sculpt Together round trip). `tests/test_ui_names.py` draws every panel, pie and popup into
 a recording layout and fails on any property, operator argument, panel or menu
 name this Blender version doesn't have. Run them with
 `blender -b --python tests/<file>` or with the `bpy` module from PyPI
@@ -90,6 +113,10 @@ Interactive behaviour needs a real viewport. Manual checklist:
 - [ ] Every sidebar panel draws, and its ? button shows help.
 - [ ] Deform buttons change the mesh; masked areas stay still.
 - [ ] Multires Subdivide on a fresh mesh adds the modifier; level − / + work.
+- [ ] Depth Limit with Auto on: a heavy Clay stroke stops at Max Height.
+- [ ] Gravity Screen ↓ / Into Screen / Drag Direction change how strokes sag.
+- [ ] Copy Stamp: sample a detailed area, stamp it on a smooth one.
+- [ ] Sculpt Together: combine two meshes, sculpt across both, split back.
 
 ## License
 

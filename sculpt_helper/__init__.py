@@ -3,9 +3,21 @@
 
 import bpy
 
-from . import keymap, menus, ops_hold_isolate, ops_hold_mask, panels, prefs, props, ui
+from bpy.app.handlers import persistent
 
-_modules = (props, prefs, ops_hold_mask, ops_hold_isolate, ui, panels, menus)
+from . import (keymap, menus, ops_gravity, ops_hold_isolate, ops_hold_mask, ops_masks,
+               ops_material, ops_multi, ops_shape, ops_stamp, panels, prefs, props, ui)
+
+_modules = (props, prefs, ops_hold_mask, ops_hold_isolate, ops_masks, ops_shape,
+            ops_gravity, ops_stamp, ops_material, ops_multi, ui, panels, menus)
+
+
+@persistent
+def _on_load(_dummy):
+    # Restart the Auto Depth Limit watcher for files saved with it on.
+    scene = bpy.context.scene
+    if scene is not None and scene.sculpt_helper.depth_limit_auto:
+        ops_shape.depth_auto_update(scene.sculpt_helper, bpy.context)
 
 
 def register():
@@ -14,9 +26,13 @@ def register():
             bpy.utils.register_class(cls)
     props.register()
     keymap.register()
+    bpy.app.handlers.load_post.append(_on_load)
 
 
 def unregister():
+    if _on_load in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(_on_load)
+    ops_shape.unregister()
     keymap.unregister()
     props.unregister()
     for mod in reversed(_modules):

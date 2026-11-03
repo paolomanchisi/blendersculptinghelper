@@ -24,10 +24,35 @@ class SculptHelperSceneSettings(bpy.types.PropertyGroup):
     extract_threshold: FloatProperty(
         name="Threshold", description="Mask value above which faces are extracted",
         default=0.5, min=0.0, max=1.0)
+    depth_limit_height: FloatProperty(
+        name="Max Height", description="How far strokes may build up above the recorded shape",
+        default=0.05, min=0.0, soft_max=1.0, unit='LENGTH', precision=4)
+    depth_limit_depth: FloatProperty(
+        name="Max Depth", description="How far strokes may cut below the recorded shape",
+        default=0.05, min=0.0, soft_max=1.0, unit='LENGTH', precision=4)
+    depth_limit_auto: BoolProperty(
+        name="Auto", description="Apply the Depth Limit after every stroke",
+        default=False, update=lambda self, ctx: _depth_auto_update(self, ctx))
+    stamp_strength: FloatProperty(
+        name="Strength", description="How strongly Copy Stamp applies the sampled detail",
+        default=1.0, min=0.0, soft_max=1.0, max=4.0)
+    stamp_smooth: IntProperty(
+        name="Detail Size", description=("Smoothing passes used to separate detail from form; "
+                                         "higher keeps larger features"),
+        default=10, min=1, max=60)
+    stamp_replace: BoolProperty(
+        name="Replace Detail",
+        description="Replace the detail already at the target instead of adding to it",
+        default=True)
     slice_new_object: BoolProperty(
         name="Slice to New Object",
         description="Keep the sliced part as a new object instead of deleting it",
         default=True)
+
+
+def _depth_auto_update(self, context):
+    from . import ops_shape
+    ops_shape.depth_auto_update(self, context)
 
 
 classes = (SculptHelperSceneSettings,)

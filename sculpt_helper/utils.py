@@ -138,3 +138,39 @@ def sculpting_mesh(context):
     that only touch object data)."""
     obj = context.active_object
     return obj is not None and obj.type == 'MESH' and context.mode == 'SCULPT'
+
+
+def raycast_active(context, coord):
+    """Ray-cast the active object at region ``coord``.
+
+    Returns (location, normal, face_index) in object space, or None."""
+    region = context.region
+    rv3d = context.region_data
+    obj = context.active_object
+    if region is None or rv3d is None or obj is None:
+        return None
+    origin = view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
+    direction = view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
+    obj_eval = obj.evaluated_get(context.evaluated_depsgraph_get())
+    inv = obj_eval.matrix_world.inverted()
+    try:
+        hit, loc, normal, index = obj_eval.ray_cast(inv @ origin,
+                                                    (inv.to_3x3() @ direction).normalized())
+    except RuntimeError:
+        return None
+    return (loc, normal, index) if hit else None
+
+
+def pixel_radius_to_object(context, coord, local_location, pixels):
+    """Convert a screen radius at a surface point to object-space length."""
+    obj = context.active_object
+    world = obj.matrix_world @ local_location
+    region, rv3d = context.region, context.region_data
+    centre = view3d_utils.location_3d_to_region_2d(region, rv3d, world)
+    if centre is None:
+        return 0.0
+    edge = view3d_utils.region_2d_to_location_3d(
+        region, rv3d, (centre[0] + pixels, centre[1]), world)
+    world_len = (edge - world).length
+    scale = max(obj.matrix_world.to_scale())
+    return world_len / scale if scale else world_len

@@ -4,7 +4,7 @@
 import bpy
 from bl_ui.properties_paint_common import BrushAssetShelf, UnifiedPaintPanel
 
-from . import utils
+from . import ops_gravity, ops_masks, ops_material, ops_multi, ops_shape, ops_stamp, utils
 from .help_text import HELP
 
 CATEGORY = "Sculpt Helper"
@@ -53,6 +53,21 @@ class SCULPT_HELPER_OT_panel_help(bpy.types.Operator):
         col.separator()
         for line in HELP.get(self.panel, ()):
             col.label(text=line)
+
+
+class SCULPT_HELPER_OT_thickness_protect(bpy.types.Operator):
+    bl_idname = "sculpt_helper.thickness_protect"
+    bl_label = "Thickness Protect"
+    bl_description = ("Keep strokes from reaching through thin parts to the far side "
+                      "(front faces only plus occlusion auto-masking)")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        am = context.tool_settings.sculpt.mesh_automasking_settings
+        on = not am.use_automasking_view_occlusion
+        am.use_automasking_view_occlusion = on
+        am.use_automasking_view_normal = on
+        return {'FINISHED'}
 
 
 class SCULPT_HELPER_OT_deform_filter(bpy.types.Operator):
@@ -183,6 +198,20 @@ def draw_brush(layout, context):
     grid.prop(am, "use_automasking_face_sets", text="Face Set", toggle=True)
     grid.prop(am, "use_automasking_boundary_face_sets", text="FS Border", toggle=True)
     grid.prop(am, "use_automasking_cavity", text="Cavity", toggle=True)
+    row = col.row(align=True)
+    row.operator("sculpt_helper.thickness_protect", text="Thickness Protect",
+                 depress=am.use_automasking_view_occlusion, icon='MOD_SOLIDIFY')
+
+    _sub_panel(layout, context, "show_depth_limit", "Depth Limit", ops_shape.draw_depth_limit)
+    _sub_panel(layout, context, "show_gravity", "Gravity", ops_gravity.draw_gravity)
+
+
+def _sub_panel(layout, context, flag, label, draw):
+    """Collapsible section (layout.panel) inside a sidebar panel."""
+    header, body = layout.panel("sculpt_helper_" + flag, default_closed=True)
+    header.label(text=label)
+    if body:
+        draw(body, context)
 
 
 def draw_mask_hide(layout, context):
@@ -211,6 +240,8 @@ def draw_mask_hide(layout, context):
     op.action, op.auto_iteration_count = 'GROW', True
     op = row.operator("paint.visibility_filter", text="Shrink")
     op.action, op.auto_iteration_count = 'SHRINK', True
+
+    _sub_panel(layout, context, "show_saved_masks", "Save / Load", ops_masks.draw_saved_masks)
 
     prefs = utils.addon_prefs(context)
     if prefs:
@@ -269,6 +300,8 @@ def draw_view_mode(layout, context):
     if has_multires:
         col.label(text="Dyntopo is unavailable with Multires", icon='INFO')
 
+    _sub_panel(layout, context, "show_multi", "Sculpt Together", ops_multi.draw_multi)
+
 
 def draw_deform(layout, context):
     settings = context.scene.sculpt_helper
@@ -288,6 +321,9 @@ def draw_deform(layout, context):
     pair(("Sphere", 'SPHERE', 1.0), ("Random", 'RANDOM', 1.0))
     pair(("Sharpen", 'SHARPEN', 1.0), ("Enhance", 'ENHANCE_DETAILS', 1.0))
     pair(("Relax", 'RELAX', 1.0), ("Relax FS", 'RELAX_FACE_SETS', 1.0))
+
+    _sub_panel(layout, context, "show_morph", "Morph", ops_shape.draw_morph)
+    _sub_panel(layout, context, "show_stamp", "Copy Stamp", ops_stamp.draw_stamp)
 
 
 def draw_face_sets(layout, context):
@@ -327,6 +363,8 @@ def draw_vertex_color(layout, context):
 
 
 def draw_material(layout, context):
+    ops_material.draw_material_slots(layout, context)
+    layout.separator()
     shading = context.space_data.shading
     row = layout.row(align=True)
     row.prop(shading, "light", expand=True)
@@ -448,6 +486,7 @@ panel_classes = tuple(_make_panel(pid, label) for pid, label in PANELS)
 
 classes = (
     SCULPT_HELPER_OT_panel_help,
+    SCULPT_HELPER_OT_thickness_protect,
     SCULPT_HELPER_OT_deform_filter,
     SCULPT_HELPER_OT_color_fill,
     SCULPT_HELPER_OT_multires_subdivide,

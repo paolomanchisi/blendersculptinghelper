@@ -8,6 +8,11 @@ HELP = {
         "Texture, Stroke and Falloff open Blender's own settings.",
         "Auto-masking limits strokes to topology, face sets,",
         "mesh or face set boundaries, front faces or cavities.",
+        "Thickness Protect stops strokes reaching the far side of thin parts.",
+        "Depth Limit: Record Shape, then strokes can't rise above Max Height",
+        "or sink below Max Depth (Auto applies it after every stroke).",
+        "Gravity pulls strokes toward the screen bottom, into the screen,",
+        "world down, or a direction you drag.",
         "Q opens the brush pie; edit its brushes in Preferences.",
     ),
     "MASK_HIDE": (
@@ -15,6 +20,8 @@ HELP = {
         "Hide / Show: show everything, invert what is visible, hide or",
         "show the masked part, or grow / shrink the visible area.",
         "Hold C for the mask brush and Shift+C to isolate an area.",
+        "Save / Load keeps named masks on the mesh. Load replaces the mask;",
+        "+ adds, − subtracts and ∩ keeps only the overlap.",
         "A opens the mask pie and Shift+W the hide pie.",
     ),
     "VIEW_MODE": (
@@ -24,6 +31,8 @@ HELP = {
         "the wireframe.",
         "Dyntopo adds or removes detail while you sculpt. Detail Flood",
         "Fill applies the current detail size to the whole mesh.",
+        "Sculpt Together joins the selected meshes into one object to sculpt",
+        "them at once; Split Back returns each part to its own object.",
         "Z opens these settings as a popup anywhere in the viewport.",
     ),
     "DEFORM": (
@@ -33,6 +42,10 @@ HELP = {
         "its normals, Sphere rounds it, Random adds noise, Sharpen and",
         "Enhance bring out detail, Relax evens out the topology.",
         "Mask the parts you want to keep still.",
+        "Morph: Record Shape, sculpt, then mask an area and press Morph",
+        "Masked to bring the recorded shape back there.",
+        "Copy Stamp: click detail to sample it, click elsewhere to stamp it.",
+        "Detail Size sets how large a feature counts as detail.",
     ),
     "FACE_SETS": (
         "Face sets split the mesh into coloured groups that you can",
@@ -48,6 +61,8 @@ HELP = {
         "Fill colours the visible, unmasked part in one go.",
     ),
     "MATERIAL": (
+        "Assign to Masked gives the masked faces the active material slot;",
+        "Mask by Material masks the faces that use it.",
         "Switch the viewport between MatCap, Studio and Flat lighting",
         "and pick a MatCap to judge forms quickly.",
         "Object colour and cavity help read small details.",
