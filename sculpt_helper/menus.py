@@ -136,6 +136,11 @@ class SCULPT_HELPER_PT_panel_toggles(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         prefs = utils.addon_prefs(context)
+        from . import floating
+        layout.operator("sculpt_helper.floating_panels",
+                        text="Floating Panels: " + ("On" if floating.is_running() else "Off"),
+                        icon='WINDOW', depress=floating.is_running())
+        layout.separator()
         layout.label(text="Show panels (N sidebar)")
         if prefs is None:
             return

@@ -7,11 +7,11 @@ from bpy.app.handlers import persistent
 
 from . import (keymap, menus, ops_boolean, ops_gravity, ops_hold_isolate, ops_hold_mask,
                ops_layers, ops_masks, ops_material, ops_multi, ops_pivot, ops_shape, ops_stamp,
-               ops_transfer, ops_transform, panels, prefs, props, ui)
+               ops_transfer, ops_transform, panels, prefs, props, ui, wheel, floating)
 
 _modules = (props, prefs, ops_hold_mask, ops_hold_isolate, ops_masks, ops_shape,
             ops_gravity, ops_stamp, ops_material, ops_multi, ops_pivot, ops_layers,
-            ops_transform, ops_transfer, ops_boolean, ui, panels, menus)
+            ops_transform, ops_transfer, ops_boolean, ui, panels, menus, wheel, floating)
 
 
 @persistent
@@ -33,6 +33,8 @@ def register():
 
 
 def unregister():
+    floating._running["on"] = False
+    wheel.clear_cache()
     if _on_load in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.remove(_on_load)
     ops_shape.unregister()

@@ -11,7 +11,7 @@ DEFAULT_ITEMS = (
     ("sculpt_helper.hold_isolate", 'C', {"shift": True}, {}, "Hold: Isolate area / face set"),
     ("sculpt_helper.shortcut_list", 'F1', {}, {}, "Shortcut list"),
     ("sculpt_helper.pivot_bend", 'Y', {}, {}, "Pivot bend / twist"),
-    ("wm.call_menu_pie", 'Q', {}, {"name": "SCULPT_HELPER_MT_brush_pie"}, "Brush pie"),
+    ("sculpt_helper.brush_wheel", 'Q', {}, {}, "Brush wheel (or pie)"),
     ("wm.call_menu_pie", 'A', {}, {"name": "SCULPT_HELPER_MT_mask_pie"}, "Mask pie"),
     ("wm.call_menu_pie", 'W', {"shift": True}, {"name": "SCULPT_HELPER_MT_hide_pie"},
      "Hide / Show pie"),

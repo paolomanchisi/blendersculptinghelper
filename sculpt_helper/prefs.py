@@ -36,9 +36,20 @@ class SCULPT_HELPER_AP_preferences(bpy.types.AddonPreferences):
         default=DEFAULT_BRUSHES,
     )
 
+    use_custom_wheel: BoolProperty(
+        name="Custom Brush Wheel",
+        description="Q opens the drawn brush wheel with thumbnails; off uses the native pie",
+        default=True,
+    )
+    floating_state: StringProperty(
+        name="Floating Panel Layout", description="Positions of the floating panels (JSON)",
+        default="", options={'HIDDEN'},
+    )
+
     def draw(self, context):
         layout = self.layout
         col = layout.column()
+        col.prop(self, "use_custom_wheel")
         col.prop(self, "isolate_method")
         col.prop(self, "front_faces_only")
         col.prop(self, "brush_favorites")

@@ -3,7 +3,7 @@
 A Blender 5.x extension that makes Sculpt Mode faster: hold keys for masking and
 isolating, quick panels, and helper tools that stock Blender lacks.
 
-Status: **all 4 steps done** (hold keys, pie menus, sidebar panels, sculpt
+Status: **all steps done, including the custom-drawn UI** (hold keys, pie menus, sidebar panels, sculpt
 helpers, advanced tools). See the plan below.
 
 ## Install
@@ -22,7 +22,7 @@ shows the current list in the viewport.
 | --- | --- |
 | **C** (hold) | Mask brush while held, previous brush comes back on release. Drag on mesh paints mask, **Ctrl**+drag removes it. Click on mesh blurs the mask, **Ctrl**+click sharpens it. Click on background inverts the mask, drag on background clears it. |
 | **Shift+C** (hold) | Isolate. Drag a box / lasso / line to show only that area (**Ctrl** on release hides it instead). **Tab** or the mouse wheel changes the shape. Click a face set to show only it, click again to show all. Click the background to show everything. |
-| **Q** | Brush pie. Seven favourite brushes get a slot; the bottom slot opens the full brush browser and lists any extra favourites. Edit the list in Preferences. |
+| **Q** | Brush wheel: a drawn ring of brush thumbnails around the cursor, hovered name in the centre. Click a brush, or point at one and let go of Q. Right-click closes. Any number of brushes (a second ring appears past twelve). Turn *Custom Brush Wheel* off in Preferences to get the native pie instead (seven favourites plus the full brush browser). Edit the brush list in Preferences. |
 | **A** | Mask pie: invert, clear, fill, blur, sharpen, grow, shrink, contrast, from cavity. |
 | **Shift+W** | Hide / Show pie: show all, invert, hide / show masked, grow / shrink visible, hide tools. |
 | **Alt+W** | Face Sets pie: from mask / visible, auto create, new colours, Draw Face Sets brush. |
@@ -35,6 +35,22 @@ These replace some Blender defaults in Sculpt Mode while the add-on is enabled
 (C Clay Strips, Shift+C Crease Polish, S Smooth, Q Quick Favourites, Z shading
 pie, A / Alt+W Blender's own mask and face set pies). The preferences show
 every default binding that is overridden, and any key can be changed there.
+
+## Floating panels
+
+In the **S** popup, *Floating Panels* turns on draggable cards drawn in the
+viewport, with a tab bar on the right edge to open and close each one (the
+top button turns floating mode off). Drag a card by its header; the header
+buttons collapse it (▾), explain it (?), open the full sidebar panel as a
+popup (≡) and close it (×). Cards hold the most used controls of each panel:
+radius / strength sliders and auto-masking, mask and visibility actions,
+mirror and overlays, deform filters with Pivot Bend and Gizmo, layers with
+strength sliders, and so on. Positions are remembered. Cards show only in
+the viewport they were started in and only in Sculpt Mode; clicks outside
+them go to Blender as usual.
+
+Blender doesn't autosave while floating mode is on (it keeps a modal
+operator running), so turn it off or save by hand during long sessions.
 
 ## Sidebar panels (N > Sculpt Helper)
 
@@ -101,7 +117,8 @@ per-object (voxel remesh merges the parts).
 4. **Advanced** (done): pivot bend and twist, gizmo for the unmasked part,
    sculpt layers, shape transfer after remesh, boolean layers.
 
-Next, if wanted: the custom-drawn brush wheel and floating panels.
+5. **Custom-drawn UI** (done): brush wheel with thumbnails and floating
+   panels; the native pies and sidebar panels remain as a fallback.
 
 ## Testing
 
@@ -109,7 +126,10 @@ Next, if wanted: the custom-drawn brush wheel and floating panels.
 Multires helpers. `tests/test_tools.py` checks the sculpt helpers on real mesh
 data (mask combine modes, Morph, Depth Limit, Copy Stamp, material by mask,
 Sculpt Together round trip, pivot bend geometry, sculpt layers, shape
-transfer, boolean confirm / cancel). `tests/test_ui_names.py` draws every panel, pie and popup into
+transfer, boolean confirm / cancel). `tests/test_custom_ui.py` checks the
+brush wheel and floating card layout and hit testing, and that every card
+control targets a real operator or property. The GPU drawing itself needs a
+real viewport. `tests/test_ui_names.py` draws every panel, pie and popup into
 a recording layout and fails on any property, operator argument, panel or menu
 name this Blender version doesn't have. Run them with
 `blender -b --python tests/<file>` or with the `bpy` module from PyPI
@@ -138,6 +158,8 @@ Interactive behaviour needs a real viewport. Manual checklist:
 - [ ] Gizmo: mask the body, move / rotate / scale the unmasked arm.
 - [ ] Layers: add a layer, sculpt, drag its slider to fade the change.
 - [ ] Boolean: add a sphere cutter, Edit to move it, Confirm.
+- [ ] Q: wheel shows brush thumbnails; click and release-to-pick both work.
+- [ ] S > Floating Panels: cards draw, drag, collapse, ?, ≡ and × work; sliders drag; sculpting under empty space still works.
 
 ## License
 

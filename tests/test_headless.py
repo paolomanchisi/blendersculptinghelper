@@ -45,8 +45,10 @@ if kc is not None:
           "keymap items added")
     from sculpt_helper import keymap as shk
     pies = {k.properties.name for k in km.keymap_items if k.idname == "wm.call_menu_pie"}
-    check(len(pies) == 4, "four pie menus bound")
-    for name in pies | {"SCULPT_HELPER_PT_view_popup", "SCULPT_HELPER_PT_panel_toggles"}:
+    check(len(pies) == 3, "three pie menus bound (Q is the brush wheel)")
+    check("sculpt_helper.brush_wheel" in ids, "Q brush wheel bound")
+    for name in pies | {"SCULPT_HELPER_PT_view_popup", "SCULPT_HELPER_PT_panel_toggles",
+                        "SCULPT_HELPER_MT_brush_pie"}:
         check(hasattr(bpy.types, name), f"{name} registered")
 
 # Scene: a sphere in Sculpt Mode.
